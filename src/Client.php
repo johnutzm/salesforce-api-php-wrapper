@@ -3,6 +3,7 @@
 use Crunch\Salesforce\Exceptions\RequestException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use Crunch\Salesforce\Exceptions\AuthenticationException;
+use GuzzleHttp\Psr7\Response;
 
 class Client
 {
@@ -80,6 +81,22 @@ class Client
         $response = $this->makeRequest('get', $url, ['headers' => ['Authorization' => $this->getAuthHeader()]]);
 
         return json_decode($response->getBody(), true);
+    }
+
+    /**
+     * Fetch a blob field of a specific object
+     *
+     * @param string $objectType
+     * @param string $sfId
+     * @param string $blobField
+     * @return Response
+     */
+    public function getBlob($objectType, $sfId, $blobField)
+    {
+        $url      = $this->baseUrl . '/services/data/v20.0/sobjects/' . $objectType . '/' . $sfId . '/' . $blobField;
+        $response = $this->makeRequest('get', $url, ['headers' => ['Authorization' => $this->getAuthHeader()]]);
+
+        return $response;
     }
 
     /**
