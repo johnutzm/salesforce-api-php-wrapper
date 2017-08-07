@@ -48,6 +48,29 @@ class ClientTest extends TestCase {
     }
 
     /** @test */
+    public function client_will_get_blob_field()
+    {
+        $recordId = 'abc' . rand(1000, 9999999);
+
+        $response = new \GuzzleHttp\Psr7\Response(200, array('Content-Type' => 'text/plain'), 'test response body');
+
+
+        $guzzle = m::mock('\GuzzleHttp\Client');
+        //Make sure the url contains the passed in data
+        $guzzle->shouldReceive('get')->with(stringContainsInOrder("sobjects/Test/{$recordId}/blobField") , \Mockery::type('array'))->once()->andReturn($response);
+
+
+        $sfClient = new \Crunch\Salesforce\Client($this->getClientConfigMock(), $guzzle);
+        $sfClient->setAccessToken($this->getAccessTokenMock());
+
+
+        $data = $sfClient->getBlob('Test', $recordId, 'blobField');
+
+        $this->assertEquals('test response body', $data->getBody());
+        $this->assertEquals(['text/plain'], $data->getHeader('Content-Type'));
+    }
+
+    /** @test */
     public function client_can_search()
     {
         $response = m::mock('Psr\Http\Message\ResponseInterface');
